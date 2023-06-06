@@ -13,29 +13,29 @@ def EqOfMovement(y,t,m1,m2,a,b,l0,c,g):
     dy[0] = y[2]; dy[1] = y[3]; 
     l = np.sqrt(8*(a**2)*(1 - np.cos(y[0])) + l0*(l0 - 4*a*np.sin(y[0])))
     
-    a11 = a*((4/3)*m1 + m2); a12 = m2*b*np.sin(y[1]-y[0]);
-    b1 = (-1)*(m1+m2)*g*np.cos(y[0]) + c*((l0/l) - 1)*(4*a*np.sin(y[0]) - 2*l0*np.cos(y[0])) - m2*b*np.cos(y[1]-y[0])*(y[1]**2);
+    a11 = a*((4/3)*m1 + m2); a12 = m2*b*np.sin(y[1]-y[0])
+    b1 = (-1)*(m1+m2)*g*np.cos(y[0]) + c*((l0/l) - 1)*(4*a*np.sin(y[0]) - 2*l0*np.cos(y[0])) - m2*b*np.cos(y[1]-y[0])*(y[1]**2)
     
-    a21 = a*np.sin(y[1]-y[0]); a22 = b;
-    b2 = (-1)*g*np.sin(y[1]) + a*np.cos(y[1]-y[0])*(y[0]**2);
-    
-    dy[2] = (b1*a22 - b2*a12)/(a11*a22 - a21*a12);
-    dy[3] = (a11*b2 - a21*b1)/(a11*a22 - a21*a12);
+    a21 = a*np.sin(y[1]-y[0]); a22 = b
+    b2 = (-1)*g*np.sin(y[1]) + a*np.cos(y[1]-y[0])*(y[0]**2)
+
+    dy[2] = (b1*a22 - b2*a12)/(a11*a22 - a21*a12)
+    dy[3] = (a11*b2 - a21*b1)/(a11*a22 - a21*a12)
     
     return dy
 
-t0 = 0; y0 = [0,(np.pi)/18,0,0];
-t_fin = 20; Nt = 2001;
+t0 = 0; y0 = [0,(np.pi)/18,0,0]
+t_fin = 20; Nt = 2001
 t = np.linspace(t0, t_fin, Nt)  #time grid
 
 #          (m1,m2,a,b,l0,c,g) - start params
 #t0 = 0; y0 = [0,(np.pi)/18,0,0];
-m1 = 50; m2 = 0.5; a, b, l0 = 1,1,1; c = 250; g = 9.8;
+m1 = 50; m2 = 0.5; a, b, l0 = 1,1,1; c = 250; g = 9.8
 params_0 = (m1,m2,a,b,l0,c,g)
 
 Y = odeint(EqOfMovement, y0, t ,params_0)
 
-phi = Y[:, 0]; psi = Y[:, 1]; dphi = Y[:, 2]; dpsi = Y[:, 3];
+phi = Y[:, 0]; psi = Y[:, 1]; dphi = Y[:, 2]; dpsi = Y[:, 3]
 ddphi = np.array([EqOfMovement(yi,ti,m1,m2,a,b,l0,c,g)[2] for yi,ti in zip(Y,t)])
 #endregion  
  
@@ -59,30 +59,23 @@ ax.set(xlim=[-5,5],ylim=[-4,4])
 
 #spring = ax.plot([(xP[0] + xE[0])*Lx], [yP[0]*(Ly + yE[0])], color='green')[0]
 spring = ax.plot([xE[0],xC], [yE[0],yC], color='green')[0]  #затычка
-n = 10; h = 0.05
+n = 13; h = 0.05
 L = np.sqrt(8*(a**2)*(1-np.cos(phi)) + l0*(l0 - 4*a*np.sin(psi)))
 Lx, Ly = (2*a*(1 - np.cos(phi))), (l0 - 2*a*np.sin(phi))
-Ln = L/13
+Ln = L/n
 alpha = np.arctan(L/(2*h))
 theta = np.arctan(Ly/Lx) 
 R = h / np.cos(alpha)
 xPs, yPs = Ln*np.cos(theta), Ln*np.sin(theta)
 sP = []
-for i in range(n):
+  
+for i in range(int(n/2)):
     item = ax.plot(xE[0] + (i+1)*xPs[0], yE[0] + (i+1)*yPs[0], 'o',color='blue')[0]
     sP.append(item)
-print(sP)
-
-# Ps_0 = ax.plot(xE[0] + xPs[0], yE[0] + yPs[0], 'o',color='blue')[0]
-# Ps_1 = ax.plot(xE[0] + 2*xPs[0], yE[0] + 2*yPs[0], 'o',color='blue')[0]
-# Ps_2 = ax.plot(xE[0] + 3*xPs[0], yE[0] + 3*yPs[0], 'o',color='blue')[0]
-# Ps_3 = ax.plot(xE[0] + 4*xPs[0], yE[0] + 4*yPs[0], 'o',color='blue')[0]
-# Ps_4 = ax.plot(xE[0] + 5*xPs[0], yE[0] + 5*yPs[0], 'o',color='blue')[0]
-# Ps_5 = ax.plot(xE[0] + 6*xPs[0], yE[0] + 6*yPs[0], 'o',color='blue')[0]
-# Ps_6 = ax.plot(xE[0] + 7*xPs[0], yE[0] + 7*yPs[0], 'o',color='blue')[0]
-# Ps_7 = ax.plot(xE[0] + 8*xPs[0], yE[0] + 8*yPs[0], 'o',color='blue')[0]
-# Ps_8 = ax.plot(xE[0] + 9*xPs[0], yE[0] + 9*yPs[0], 'o',color='blue')[0]
-# Ps_9 = ax.plot(xE[0] + 10*xPs[0], yE[0] + 10*yPs[0], 'o',color='blue')[0]
+    
+for i in range(6,n):
+    item = ax.plot(xC - (i+1)*xPs[0], yC - (i+1)*yPs[0], 'o',color='black')[0]
+    sP.append(item)
 
 
 wall_vertical = ax.plot([0, 0], [0, 3], color='blue', linewidth = 5)    
@@ -110,24 +103,14 @@ def kadr(i):
     #spring.set_data([(xP[i] + xE[i])*Lx], [(yP[i]*+ yE[i])*Ly])
     spring.set_data([xE[i],xC], [yE[i],yC])
     
+    # for j,item in enumerate(sP):
+    #     item.set_data(xE[i] + (j+1)*xPs[i], yE[i] + (j+1)*yPs[i])
     for j,item in enumerate(sP):
-        item.set_data(xE[i] + (j+1)*xPs[i], yE[i] + (j+1)*yPs[i])
+         item.set_data(xC - (j+1)*xPs[i], yC - (j+1)*yPs[i])
     
-    # Ps_0.set_data(xE[i] + xPs[i], yE[i] + yPs[i])
-    # Ps_1.set_data(xE[i] + 2*xPs[i], yE[i] + 2*yPs[i])
-    # Ps_2.set_data(xE[i] + 3*xPs[i], yE[i] + 3*yPs[i])
-    # Ps_3.set_data(xE[i] + 4*xPs[i], yE[i] + 4*yPs[i])
-    # Ps_4.set_data(xE[i] + 5*xPs[i], yE[i] + 5*yPs[i])
-    # Ps_5.set_data(xE[i] + 6*xPs[i], yE[i] + 6*yPs[i])
-    # Ps_6.set_data(xE[i] + 7*xPs[i], yE[i] + 7*yPs[i])
-    # Ps_7.set_data(xE[i] + 8*xPs[i], yE[i] + 8*yPs[i])
-    # Ps_8.set_data(xE[i] + 9*xPs[i], yE[i] + 9*yPs[i])
-    # Ps_9.set_data(xE[i] + 10*xPs[i], yE[i] + 10*yPs[i])
-    
-
     
     return [D, A, E, B, C, DE, AB, spring, *sP]
-            #Ps_9,Ps_8,Ps_7,Ps_6,Ps_5,Ps_4,Ps_3,Ps_2,Ps_1,Ps_0
+            
 
 kino = FuncAnimation(fig, kadr, interval = t[1]-t[2], frames=len(t))
 
