@@ -46,7 +46,7 @@ ddphi = np.array([EqOfMovement(yi,ti,m1,m2,a,b,l0,c,g)[2] for yi,ti in zip(Y,t)]
 #      0 1  2 3 4  5 6
 
 N_A = m2*(g*np.cos(psi) + b*(dpsi**2) + a*(ddphi*np.cos(psi-phi) + (dphi**2)*np.sin(psi-phi)));
-#end region 
+#endregion 
 
 #region Graphs of Coord.
 fig0 = plt.figure(figsize=[13,9])
