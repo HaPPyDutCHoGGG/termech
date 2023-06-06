@@ -53,6 +53,7 @@ Ps_5 = ax.plot(xE[0] + 6*xPs[0], yE[0] + 6*yPs[0], 'o',color='blue')[0]
 Ps_6 = ax.plot(xE[0] + 7*xPs[0], yE[0] + 7*yPs[0], 'o',color='blue')[0]
 Ps_7 = ax.plot(xE[0] + 8*xPs[0], yE[0] + 8*yPs[0], 'o',color='blue')[0]
 Ps_8 = ax.plot(xE[0] + 9*xPs[0], yE[0] + 9*yPs[0], 'o',color='blue')[0]
+Ps_9 = ax.plot(xE[0] + 10*xPs[0], yE[0] + 10*yPs[0], 'o',color='blue')[0]
 
 
 wall_vertical = ax.plot([0, 0], [0, 3], color='blue', linewidth = 5)    
@@ -89,11 +90,12 @@ def kadr(i):
     Ps_6.set_data(xE[i] + 7*xPs[i], yE[i] + 7*yPs[i])
     Ps_7.set_data(xE[i] + 8*xPs[i], yE[i] + 8*yPs[i])
     Ps_8.set_data(xE[i] + 9*xPs[i], yE[i] + 9*yPs[i])
+    Ps_9.set_data(xE[i] + 10*xPs[i], yE[i] + 10*yPs[i])
     
 
     
     return [D, A, E, B, C, DE, AB, spring, 
-            Ps_8,Ps_7,Ps_6,Ps_5,Ps_4,Ps_3,Ps_2,Ps_1,Ps_0]
+            Ps_9,Ps_8,Ps_7,Ps_6,Ps_5,Ps_4,Ps_3,Ps_2,Ps_1,Ps_0]
 
 kino = FuncAnimation(fig, kadr, interval = t[1]-t[2], frames=len(t))
 
