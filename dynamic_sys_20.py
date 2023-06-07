@@ -31,15 +31,14 @@ t = np.linspace(t0, t_fin, Nt)  #time grid
 #          (m1,m2,a,b,l0,c,g) - start params
 #t0 = 0; y0 = [0,(np.pi)/18,0,0];
 m1 = 50; m2 = 0.5; a, b, l0 = 1,1,1; c = 250; g = 9.8
-params_0 = (m1,m2,a,b,l0,c,g)
+#params_0 = (m1,m2,a,b,l0,c,g)
+params_0 = (5, 6, 1, 1, 1, 300, g)
 
 Y = odeint(EqOfMovement, y0, t ,params_0)
 
 phi = Y[:, 0]; psi = Y[:, 1]; dphi = Y[:, 2]; dpsi = Y[:, 3]
 ddphi = np.array([EqOfMovement(yi,ti,m1,m2,a,b,l0,c,g)[2] for yi,ti in zip(Y,t)])
 #endregion  
- 
-
 
 #region Animation
 #    (m1,m2,a,b,l0,c,g) - start params
@@ -57,38 +56,35 @@ ax = fig.add_subplot(1,1,1)
 ax.axis('equal')
 ax.set(xlim=[-5,5],ylim=[-4,4])
 
-#spring = ax.plot([(xP[0] + xE[0])*Lx], [yP[0]*(Ly + yE[0])], color='green')[0]
 spring = ax.plot([xE[0],xC], [yE[0],yC], color='green')[0]  #затычка
-n = 13; h = 0.05
-L = np.sqrt(8*(a**2)*(1-np.cos(phi)) + l0*(l0 - 4*a*np.sin(psi)))
-Lx, Ly = (2*a*(1 - np.cos(phi))), (l0 - 2*a*np.sin(phi))
-Ln = L/n
-alpha = np.arctan(L/(2*h))
-theta = np.arctan(Ly/Lx) 
-R = h / np.cos(alpha)
-xPs, yPs = Ln*np.cos(theta), Ln*np.sin(theta)
-sP = []
-  
-for i in range(int(n/2)):
-    item = ax.plot(xE[0] + (i+1)*xPs[0], yE[0] + (i+1)*yPs[0], 'o',color='blue')[0]
-    sP.append(item)
+# n = 13; h = 0.05
+# L = np.sqrt(8*(a**2)*(1-np.cos(phi)) + l0*(l0 - 4*a*np.sin(psi)))
+# Lx, Ly = (2*a*(1 - np.cos(phi))), (l0 - 2*a*np.sin(phi))
+# Ln = L/n
+# alpha = np.arctan(L/(2*h))
+# theta = np.arctan(Ly/Lx) 
+# R = h / np.cos(alpha)
+# xPs, yPs = Ln*np.cos(theta), Ln*np.sin(theta)
+# sP = []
+# for i in range(n):
+#     item = ax.plot(xE[0] + (i+1)*xPs[0], yE[0] + (i+1)*yPs[0], 'o',color='blue')[0]
+#     sP.append(item)
     
-for i in range(6,n):
-    item = ax.plot(xC - (i+1)*xPs[0], yC - (i+1)*yPs[0], 'o',color='black')[0]
-    sP.append(item)
+# for i in range(int((n/2)+1),n):
+#     item = ax.plot(xC - (i+1)*xPs[0], yC - (i+1)*yPs[0], 'o',color='black')[0]
+#     sP_2.append(item)
 
 
-wall_vertical = ax.plot([0, 0], [0, 3], color='blue', linewidth = 5)    
-wall_horizontal = ax.plot([0, 3], [0, 0], color='blue', linewidth = 5)
+wall_vertical = ax.plot([0, 0], [0, 3], color='blue', linewidth = 1)    
+wall_horizontal = ax.plot([0, 3], [0, 0], color='blue', linewidth = 1)
 
 DE = ax.plot([xD,xE[0]], [yD,yE[0]], color='red', linewidth = 4)[0]     
-AB = ax.plot([xA[0],xB[0]], [yA[0],yB[0]], color='green')[0]
-
+AB = ax.plot([xA[0],xB[0]], [yA[0],yB[0]], color='black')[0]
 
 D = ax.plot(xD, yD, 'o', color='red')[0]
 A = ax.plot(xA[0], yA[0], 'o', color='red')[0]
 E = ax.plot(xE[0], yE[0], 'o', color='red')[0]
-B = ax.plot(xB[0], yB[0], 'o', color='green')[0]
+B = ax.plot(xB[0], yB[0], 'o', color='black')[0]
 C = ax.plot(xC, yC, 'o', color='green')[0]
 
 def kadr(i):
@@ -105,15 +101,10 @@ def kadr(i):
     
     # for j,item in enumerate(sP):
     #     item.set_data(xE[i] + (j+1)*xPs[i], yE[i] + (j+1)*yPs[i])
-    for j,item in enumerate(sP):
-         item.set_data(xC - (j+1)*xPs[i], yC - (j+1)*yPs[i])
-    
-    
-    return [D, A, E, B, C, DE, AB, spring, *sP]
+      
+    return [D, A, E, B, C, DE, AB, spring]#, *sP]
             
-
 kino = FuncAnimation(fig, kadr, interval = t[1]-t[2], frames=len(t))
-
 
 N_A = m2*(g*np.cos(psi) + b*(dpsi**2) + a*(ddphi*np.cos(psi-phi) + (dphi**2)*np.sin(psi-phi)));
 #endregion 
