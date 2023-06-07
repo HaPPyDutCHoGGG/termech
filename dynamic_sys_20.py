@@ -45,9 +45,11 @@ t = np.linspace(t0, t_fin, Nt)  #time grid
 #          (m1,m2,a,b,l0,c,g) - start params
 #t0 = 0; y0 = [0,(np.pi)/18,0,0];
 m1 = 50; m2 = 0.5; a, b, l0 = 1,1,1; c = 250; g = 9.8
-params_0 = (m1,m2,a,b,l0,c,g)
-#params_0 = (5, 6, 1, 1, 1, 300, g)
-#params_0 = (200, 100, 0.5, 1, 2, 50, g)
+#params_0 = (m1,m2,a,b,l0,c,g)
+#params_0 = (10, 9, 1.5, 2, 0.5, 25, g)
+#params_0 = (1, 50, 1.5, 0.5, 1, 100, g)
+params_0 = (5, 6, 1, 1, 1, 300, g)
+
 
 Y = odeint(EqOfMovement, y0, t ,params_0)
 
