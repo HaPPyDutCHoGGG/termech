@@ -4,6 +4,18 @@ from matplotlib.animation import FuncAnimation
 from scipy.integrate import odeint
 
 #region Calculation of coord.
+def rotate(origin, point, angle):
+    x = origin[0]
+    y = origin[1]
+    px = point[0]
+    py = point[1]
+    nx = x + np.cos(angle) * (px - x) - np.sin(angle) * (py - y)
+    ny = y + np.sin(angle) * (px - x) + np.cos(angle) * (py - y)
+    return np.array([nx, ny])
+
+def distance(x1, x2, y1, y2):
+    return ((x1 - x2)**2 + (y1 - y2)**2)**0.5
+
 def EqOfMovement(y,t,m1,m2,a,b,l0,c,g):
     
     #  y[0,1,2,3] = phi,psi,phi',psi'
@@ -24,15 +36,18 @@ def EqOfMovement(y,t,m1,m2,a,b,l0,c,g):
     
     return dy
 
-t0 = 0; y0 = [0,(np.pi)/18,0,0]
+t0 = 0; 
+y0 = [0,(np.pi)/18,0,0]
+#y0 = [(np.pi/3),(np.pi/4),0,0]
 t_fin = 20; Nt = 2001
 t = np.linspace(t0, t_fin, Nt)  #time grid
 
 #          (m1,m2,a,b,l0,c,g) - start params
 #t0 = 0; y0 = [0,(np.pi)/18,0,0];
 m1 = 50; m2 = 0.5; a, b, l0 = 1,1,1; c = 250; g = 9.8
-#params_0 = (m1,m2,a,b,l0,c,g)
-params_0 = (5, 6, 1, 1, 1, 300, g)
+params_0 = (m1,m2,a,b,l0,c,g)
+#params_0 = (5, 6, 1, 1, 1, 300, g)
+#params_0 = (200, 100, 0.5, 1, 2, 50, g)
 
 Y = odeint(EqOfMovement, y0, t ,params_0)
 
@@ -42,7 +57,6 @@ ddphi = np.array([EqOfMovement(yi,ti,m1,m2,a,b,l0,c,g)[2] for yi,ti in zip(Y,t)]
 
 #region Animation
 #    (m1,m2,a,b,l0,c,g) - start params
-#      0 1  2 3 4  5 6
 x0, y0 = 0, 0
 xD, yD = x0, y0
 xA, yA = (x0 + a*np.cos(phi)), (y0 + a*np.sin(phi))
@@ -56,23 +70,46 @@ ax = fig.add_subplot(1,1,1)
 ax.axis('equal')
 ax.set(xlim=[-5,5],ylim=[-4,4])
 
-spring = ax.plot([xE[0],xC], [yE[0],yC], color='green')[0]  #затычка
-# n = 13; h = 0.05
-# L = np.sqrt(8*(a**2)*(1-np.cos(phi)) + l0*(l0 - 4*a*np.sin(psi)))
-# Lx, Ly = (2*a*(1 - np.cos(phi))), (l0 - 2*a*np.sin(phi))
-# Ln = L/n
-# alpha = np.arctan(L/(2*h))
-# theta = np.arctan(Ly/Lx) 
-# R = h / np.cos(alpha)
-# xPs, yPs = Ln*np.cos(theta), Ln*np.sin(theta)
-# sP = []
-# for i in range(n):
-#     item = ax.plot(xE[0] + (i+1)*xPs[0], yE[0] + (i+1)*yPs[0], 'o',color='blue')[0]
-#     sP.append(item)
+#spring = ax.plot([xE[0],xC], [yE[0],yC], color='green')[0]  #затычка
+n = 16; h = 0.05
+xSpringARR = [] #x of spring
+ySpringARR = [] #y of spring
+for i in range(Nt):
+    spX = np.linspace(0, distance(xC, xE[i], yC, yE[i]), 2*n+1)  # correct length spring
+    spY = np.zeros(2*n+1)
+    ss = 0
+    #length of spring
+    for j in range(2*n+1):
+        spY[j] = h*np.sin(ss)
+        ss += 3.14 / 2
+    #rotation of spring
+    for k in range(2*n+1):
+        if yE[i] > yC and xE[i] < xC:
+            spX[k], spY[k] = rotate([0, 0], [spX[k], spY[k]], np.pi - np.math.atan(abs(yE[i]-yC)/abs(xC-xE[i])))
+        elif yE[i] > yC and xE[i] > xC: #=
+            spX[k], spY[k] = rotate([0, 0], [spX[k], spY[k]], np.math.atan(abs(yE[i] - yC) / abs(xE[i] - xC)))
+        elif yE[i] < yC and xE[i] > xC:
+            spX[k], spY[k] = rotate([0, 0], [spX[k], spY[k]], -np.math.atan(abs(yC - yE[i]) / abs(xE[i] - xC)))
+        elif yE[i] < yC and xE[i] < xC: #=
+            spX[k], spY[k] = rotate([0, 0], [spX[k], spY[k]], np.pi + np.math.atan(abs(yC - yE[i]) / abs(xC - xE[i])))
+        elif yE[i] == yC:
+            if xC <= xE[i]:
+                spX[k], spY[k] = rotate([0, 0], [spX[k], spY[k]], 0)
+            else:
+                spX[k], spY[k] = rotate([0, 0], [spX[k], spY[k]], np.pi)
+        elif xE[i] == xC:
+            if yE[i] >= yC:
+                spX[k], spY[k] = rotate([0, 0], [spX[k], spY[k]], np.pi/2)
+            else:
+                spX[k], spY[k] = rotate([0, 0], [spX[k], spY[k]], -np.pi/2)
+    #add coord to array of spring coord
+    for k in range(2*n+1):
+        spX[k] += xC
+        spY[k] += yC
+    xSpringARR.append(spX)
+    ySpringARR.append(spY)
     
-# for i in range(int((n/2)+1),n):
-#     item = ax.plot(xC - (i+1)*xPs[0], yC - (i+1)*yPs[0], 'o',color='black')[0]
-#     sP_2.append(item)
+spring = ax.plot(xSpringARR[0], ySpringARR[0], color=[0,0,0])[0]
 
 
 wall_vertical = ax.plot([0, 0], [0, 3], color='blue', linewidth = 1)    
@@ -96,13 +133,11 @@ def kadr(i):
     
     DE.set_data([xD,xE[i]], [yD,yE[i]])
     AB.set_data([xA[i],xB[i]], [yA[i],yB[i]])
-    #spring.set_data([(xP[i] + xE[i])*Lx], [(yP[i]*+ yE[i])*Ly])
-    spring.set_data([xE[i],xC], [yE[i],yC])
     
-    # for j,item in enumerate(sP):
-    #     item.set_data(xE[i] + (j+1)*xPs[i], yE[i] + (j+1)*yPs[i])
+    spring.set_data(xSpringARR[i], ySpringARR[i])
+    
       
-    return [D, A, E, B, C, DE, AB, spring]#, *sP]
+    return [D, A, E, B, C, DE, AB, spring]
             
 kino = FuncAnimation(fig, kadr, interval = t[1]-t[2], frames=len(t))
 
